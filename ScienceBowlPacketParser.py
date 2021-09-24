@@ -29,7 +29,8 @@ def readUntilString(sentence, startIndex, endString):
         return sentence[startIndex:endIndex] #return substring between the two indices
     else:
         return "NOT FOUND" #If endString not found
-   
+
+#Divies packet by page numbers
 def splitApartPages(organizedPacket):
     pageNumber = 1 #Start with page 1
     for i in range(len(contents)):
@@ -59,6 +60,16 @@ class Question:
     questionText = ""
     questionAnswer = ""
 
+    def __str__ (self):
+        s = ("Question number: " +  self.questionNumber + "\n" +
+            "Toss-up or bonus?: " + self.questionTypeA + "\n" +
+            "MCQ or Short-answer?: " + self.questionTypeB + "\n" +
+            "Question Category: " + self.questionCategory + "\n" +
+            "Question: " + self.questionText + "\n" +
+            self.questionAnswer + "\n")
+        return s
+       
+
     def __init__ (self, roundNumber, pageNumber, questionNumber, questionTypeA, questionTypeB, questionCategory, questionText, questionAnswer):
         self.roundNumber = roundNumber
         self.pageNumber = pageNumber
@@ -69,45 +80,54 @@ class Question:
         self.questionText = questionText
         self.questionAnswer = questionAnswer
 
-for i in range(0,len(contents)):
-    #Check if it is toss-up question
-    newQuestion = Question(0, 0, 0, "", "", "", "", "")
-    #print(contents[i])
-    if ("TOSS-UP" in contents[i]):
-        newQuestion.questionTypeA = "TOSS-UP"
-    elif ("BONUS" in contents[i]):
-        newQuestion.questionTypeA = "BONUS"
-    if newQuestion.questionTypeA == "TOSS-UP" or newQuestion.questionTypeA == "BONUS":
-        print(newQuestion.questionTypeA)
-        newQuestion.questionNumber = readUntilString(contents[i+1], 0, ")")
-        print(newQuestion.questionNumber)
-        newQuestion.questionCategory = readUntilString(contents[i+1], 3, "–")
-        print(newQuestion.questionCategory)
-        startIndexOfQuestionType = contents[i+1].find("–") + 2#Assumes first hyphen is after category name, +2 accounts for space after hypen
-        if (contents[i+1][startIndexOfQuestionType:startIndexOfQuestionType+15] == "Multiple Choice"): #There are 15 char in "Multiple Choice"
-            newQuestion.questionTypeB = "Multiple Choice"
-            print(newQuestion.questionTypeB)
-            fullQuestion = ""
-            for k in range(1,7):#No reason to do (1,7), just trying to get enough lines to encompass whole question
-                fullQuestion += contents[i+k]
-            newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+15,"ANSWER")
-            print(newQuestion.questionText)
-            newQuestion.questionAnswer = fullQuestion[fullQuestion.find("ANSWER"):]
-            print(newQuestion.questionAnswer)
-        else:
-            newQuestion.questionTypeB = "Short Answer"
-            print(newQuestion.questionTypeB)
-            fullQuestion = ""
-            for k in range(1,4):#No reason to do (1,4), just trying to get enough lines to encompass whole question
-                fullQuestion += contents[i+k]
-            newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+12,"ANSWER")
-            print(newQuestion.questionText)
-            for k in range(i+2, len(contents)):
-                if ("ANSWER" in contents[k]):
-                    newQuestion.questionAnswer = contents[k]
-                    break
-            print(newQuestion.questionAnswer)
-        questions.append(newQuestion)
-        print("\n\n")
+def createQuestionArray(contents):
+    for i in range(0,len(contents)):
+        #Check if it is toss-up question
+        newQuestion = Question(0, 0, 0, "", "", "", "", "") # Reset the class we will append
+        #print(contents[i])
+        if ("TOSS-UP" in contents[i]):
+            newQuestion.questionTypeA = "TOSS-UP"
+        elif ("BONUS" in contents[i]):
+            newQuestion.questionTypeA = "BONUS"
+        if newQuestion.questionTypeA == "TOSS-UP" or newQuestion.questionTypeA == "BONUS":
+            #print(newQuestion.questionTypeA)
+            newQuestion.questionNumber = readUntilString(contents[i+1], 0, ")")
+            #print(newQuestion.questionNumber)
+            newQuestion.questionCategory = readUntilString(contents[i+1], 3, "–")
+            #print(newQuestion.questionCategory)
+            startIndexOfQuestionType = contents[i+1].find("–") + 2#Assumes first hyphen is after category name, +2 accounts for space after hypen
+            if (contents[i+1][startIndexOfQuestionType:startIndexOfQuestionType+15] == "Multiple Choice"): #There are 15 char in "Multiple Choice"
+                newQuestion.questionTypeB = "Multiple Choice"
+                #print(newQuestion.questionTypeB)
+                fullQuestion = ""
+                for k in range(1,7):#No reason to do (1,7), just trying to get enough lines to encompass whole question
+                    fullQuestion += contents[i+k]
+                newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+15,"ANSWER")
+                #print(newQuestion.questionText)
+                newQuestion.questionAnswer = fullQuestion[fullQuestion.find("ANSWER"):]
+                #print(newQuestion.questionAnswer)
+            else:
+                newQuestion.questionTypeB = "Short Answer"
+                #print(newQuestion.questionTypeB)
+                fullQuestion = ""
+                for k in range(1,4):#No reason to do (1,4), just trying to get enough lines to encompass whole question
+                    fullQuestion += contents[i+k]
+                newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+12,"ANSWER")
+                #print(newQuestion.questionText)
+                for k in range(i+2, len(contents)):
+                    if ("ANSWER" in contents[k]):
+                        newQuestion.questionAnswer = contents[k]
+                        break
+                #print(newQuestion.questionAnswer)
+            questions.append(newQuestion)
+            #print("\n\n")
+            
+    return questions
+
+questions = createQuestionArray(contents)
+for q in questions:
+    print(q)
+
+
 
 
