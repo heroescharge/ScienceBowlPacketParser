@@ -1,8 +1,16 @@
 #Potential changes:
 #When finding page number, keep searching until no integer is found instead of when a space is found
 
+
+#ISSUES:
+#Small issues:
+#15A_MS_Reg_2016 Q6 Toss up: Option W is not on a separate line,the word "bonus" from the next question is put into the answer
+#15A_MS_Reg_2016 Q16 Bonus: The question spans two lines due to an equation on it giving next line formatting, causes answer to not be copied
+
+
 #Layer order of array: page number, 
 organizedPacket = []
+questions = []
 
 with open("15A_MS_Reg_2016.txt") as questionPacket:
     contents = questionPacket.readlines()
@@ -16,7 +24,7 @@ def readUntilString(sentence, startIndex, endString):
     if (endIndex >= 0):
         return sentence[startIndex:endIndex] #return substring between the two indices
     else:
-        return "NOTFOUND" #If endString not found
+        return "NOT FOUND" #If endString not found
    
 def splitApartPages(organizedPacket):
     pageNumber = 1 #Start with page 1
@@ -75,10 +83,10 @@ for i in range(0,len(contents)):
         if (contents[i+1][startIndexOfQuestionType:startIndexOfQuestionType+15] == "Multiple Choice"): #There are 15 char in "Multiple Choice"
             newQuestion.questionTypeB = "Multiple Choice"
             print(newQuestion.questionTypeB)
-            fullQuestion = contents[i+1] + contents[i+2] + contents[i+3] + contents[i+4] + contents[i+5]
+            fullQuestion = contents[i+1] + contents[i+2] + contents[i+3] + contents[i+4] + contents[i+5] + contents[i+6]
             newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+15,"ANSWER")
             print(newQuestion.questionText)
-            newQuestion.questionAnswer = fullQuestion[fullQuestion.find("Answer"):]
+            newQuestion.questionAnswer = fullQuestion[fullQuestion.find("ANSWER"):]
             print(newQuestion.questionAnswer)
         else:
             newQuestion.questionTypeB = "Short Answer"
