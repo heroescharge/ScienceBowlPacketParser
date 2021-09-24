@@ -1,11 +1,15 @@
 #Potential changes:
 #When finding page number, keep searching until no integer is found instead of when a space is found
+#Using arbitrary number of lines to parse for question statement is not a great way to do it
 
 
 #ISSUES:
 #Small issues:
 #15A_MS_Reg_2016 Q6 Toss up: Option W is not on a separate line,the word "bonus" from the next question is put into the answer
-#15A_MS_Reg_2016 Q16 Bonus: The question spans two lines due to an equation on it giving next line formatting, causes answer to not be copied
+#15A_MS_Reg_2016 Q11 Bonus: ~~~ separator line gets pooled in with answer because option W is not on a separate line
+
+#Assumptions:
+#Question number always followed by parentheses ")"
 
 
 #Layer order of array: page number, 
@@ -15,7 +19,7 @@ questions = []
 with open("15A_MS_Reg_2016.txt") as questionPacket:
     contents = questionPacket.readlines()
 
-#Returns string starting from inputted index until it finds the endstring NOT including the endstring but including the startIndex
+#Returns string starting from inputted index until it finds the endstring NOT including the endstring but including the startIndex, overloaded version takes in a list of strings to stop at
 #Ex. readUntilString("hello world, how is it going", 2, "rld") returns "llo wo"
 def readUntilString(sentence, startIndex, endString):
     iterate = 0
@@ -75,7 +79,7 @@ for i in range(0,len(contents)):
         newQuestion.questionTypeA = "BONUS"
     if newQuestion.questionTypeA == "TOSS-UP" or newQuestion.questionTypeA == "BONUS":
         print(newQuestion.questionTypeA)
-        newQuestion.questionNumber = contents[i+1][0]
+        newQuestion.questionNumber = readUntilString(contents[i+1], 0, ")")
         print(newQuestion.questionNumber)
         newQuestion.questionCategory = readUntilString(contents[i+1], 3, "–")
         print(newQuestion.questionCategory)
@@ -83,7 +87,9 @@ for i in range(0,len(contents)):
         if (contents[i+1][startIndexOfQuestionType:startIndexOfQuestionType+15] == "Multiple Choice"): #There are 15 char in "Multiple Choice"
             newQuestion.questionTypeB = "Multiple Choice"
             print(newQuestion.questionTypeB)
-            fullQuestion = contents[i+1] + contents[i+2] + contents[i+3] + contents[i+4] + contents[i+5] + contents[i+6]
+            fullQuestion = ""
+            for k in range(1,7):#No reason to do (1,7), just trying to get enough lines to encompass whole question
+                fullQuestion += contents[i+k]
             newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+15,"ANSWER")
             print(newQuestion.questionText)
             newQuestion.questionAnswer = fullQuestion[fullQuestion.find("ANSWER"):]
@@ -91,9 +97,15 @@ for i in range(0,len(contents)):
         else:
             newQuestion.questionTypeB = "Short Answer"
             print(newQuestion.questionTypeB)
-            newQuestion.questionText = readUntilString(contents[i+1] + contents[i+2],startIndexOfQuestionType+12,"ANSWER")
+            fullQuestion = ""
+            for k in range(1,4):#No reason to do (1,4), just trying to get enough lines to encompass whole question
+                fullQuestion += contents[i+k]
+            newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+12,"ANSWER")
             print(newQuestion.questionText)
-            newQuestion.questionAnswer = contents[i+2]
+            for k in range(i+2, len(contents)):
+                if ("ANSWER" in contents[k]):
+                    newQuestion.questionAnswer = contents[k]
+                    break
             print(newQuestion.questionAnswer)
         questions.append(newQuestion)
         print("\n\n")
