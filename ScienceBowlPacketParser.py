@@ -7,16 +7,19 @@
 #Small issues:
 #15A_MS_Reg_2016 Q6 Toss up: Option W is not on a separate line,the word "bonus" from the next question is put into the answer
 #15A_MS_Reg_2016 Q11 Bonus: ~~~ separator line gets pooled in with answer because option W is not on a separate line
+#LARGE issues:
+#15A_MS_Reg_2016 Q23 Bonus: ANSWER is on same line as question statement, doesnt get assigned to answer
 
 #Assumptions:
 #Question number always followed by parentheses ")"
+#Answer to question is on its own line
 
 
 #Layer order of array: page number, 
 organizedPacket = []
 questions = []
 
-with open("15A_MS_Reg_2016.txt") as questionPacket:
+with open("9A_MS_Reg_2016.txt") as questionPacket:
     contents = questionPacket.readlines()
 
 #Returns string starting from inputted index until it finds the endstring NOT including the endstring but including the startIndex, overloaded version takes in a list of strings to stop at
@@ -81,6 +84,7 @@ class Question:
         self.questionAnswer = questionAnswer
 
 def createQuestionArray(contents):
+    questions = []
     for i in range(0,len(contents)):
         #Check if it is toss-up question
         newQuestion = Question(0, 0, 0, "", "", "", "", "") # Reset the class we will append
@@ -105,12 +109,12 @@ def createQuestionArray(contents):
                 newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+15,"ANSWER")
                 #print(newQuestion.questionText)
                 newQuestion.questionAnswer = fullQuestion[fullQuestion.find("ANSWER"):]
-                #print(newQuestion.questionAnswer)
+                #print(newQuestion.questionAnswer) 
             else:
                 newQuestion.questionTypeB = "Short Answer"
                 #print(newQuestion.questionTypeB)
                 fullQuestion = ""
-                for k in range(1,4):#No reason to do (1,4), just trying to get enough lines to encompass whole question
+                for k in range(min(1,len(contents)-i-1),min(4,len(contents)-i-1)):#No reason to do (1,4), just trying to get enough lines to encompass whole question
                     fullQuestion += contents[i+k]
                 newQuestion.questionText = readUntilString(fullQuestion,startIndexOfQuestionType+12,"ANSWER")
                 #print(newQuestion.questionText)
